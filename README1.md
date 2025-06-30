@@ -7,7 +7,7 @@
 
 ### How to start:
 1. Install all requirements:
-    `pip install requirements.txt`
+    `pip install -r requirements.txt`
 
 2. Fill in the .env file by given .env.sample.
      (WeatherAPI key)

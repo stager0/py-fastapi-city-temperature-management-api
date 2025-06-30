@@ -1,8 +1,10 @@
 import asyncio
 import copy
+import os
 from datetime import datetime
 
 import httpx
+from dotenv import load_dotenv
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -12,8 +14,10 @@ from city_api.database import get_db
 from city_api.models import City, Temperature
 from city_api.schemas import CityCreateResponseSchema, CityCreateRequest, TemperatureResponse
 
+
+load_dotenv()
 router = APIRouter(prefix="/cities")
-API_KEY = "d9901d4b20fb4d33b9f130706252806"
+API_KEY = os.getenv("API_KEY")
 
 
 async def update_temp(city: City):
@@ -33,7 +37,7 @@ async def update_temp(city: City):
             return {
                 "city_id": city.id,
                 "temp": response["current"]["temp_c"],
-                "data": last_updated
+                "date_time": last_updated
             }
 
         except Exception as e:
@@ -61,7 +65,7 @@ async def city_retrieve(city_id: int, db: AsyncSession = Depends(get_db)):
     return city
 
 
-@router.post("/{city_id}/", response_model=CityCreateResponseSchema, tags=["city"])
+@router.post("/{city_id}/update/", response_model=CityCreateResponseSchema, tags=["city"])
 async def city_update(city_id: int, new_data: CityCreateRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(City).filter(City.id == city_id))
     city = result.scalar_one_or_none()
@@ -95,7 +99,7 @@ async def create_city(city_data: CityCreateRequest, db: AsyncSession = Depends(g
         raise HTTPException(status_code=500, detail=f"Something went wrong during city creation. ({error})")
 
 
-@router.post("/{city_id}/", status_code=200, tags=["city"])
+@router.post("/{city_id}/delete/", status_code=200, tags=["city"])
 async def delete_city(city_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(City).filter(City.id == city_id))
     city = result.scalar_one_or_none()
@@ -136,7 +140,7 @@ async def update_temperature(db: AsyncSession = Depends(get_db)):
                 for temperature in temperatures:
                     if temperature.city_id == change["city_id"]:
                         temperature.temperature = change["temp"]
-                        temperature.date_time = change["data"]
+                        temperature.date_time = change["date_time"]
                         db.add(temperature)
 
             await db.commit()

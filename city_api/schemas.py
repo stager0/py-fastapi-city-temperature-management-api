@@ -20,7 +20,10 @@ class UpdateTemperatureSchemaRequest(BaseModel):
     wind_kmh: float
 
     class Config:
-        datetime: lambda x: x.strftime("%Y-%m-%d %h:%m")
+        json_encoders = {
+            datetime: lambda x: x.strftime("%Y-%m-%d %h:%m")
+        }
+
 
 
 class TemperatureResponse(BaseModel):
