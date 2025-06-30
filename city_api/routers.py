@@ -65,7 +65,7 @@ async def city_retrieve(city_id: int, db: AsyncSession = Depends(get_db)):
     return city
 
 
-@router.post("/{city_id}/update/", response_model=CityCreateResponseSchema, tags=["city"])
+@router.put("/{city_id}/", response_model=CityCreateResponseSchema, tags=["city"])
 async def city_update(city_id: int, new_data: CityCreateRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(City).filter(City.id == city_id))
     city = result.scalar_one_or_none()
@@ -99,7 +99,7 @@ async def create_city(city_data: CityCreateRequest, db: AsyncSession = Depends(g
         raise HTTPException(status_code=500, detail=f"Something went wrong during city creation. ({error})")
 
 
-@router.post("/{city_id}/delete/", status_code=200, tags=["city"])
+@router.delete("/{city_id}/", status_code=200, tags=["city"])
 async def delete_city(city_id: int, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(City).filter(City.id == city_id))
     city = result.scalar_one_or_none()

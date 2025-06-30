@@ -21,7 +21,7 @@ class UpdateTemperatureSchemaRequest(BaseModel):
 
     class Config:
         json_encoders = {
-            datetime: lambda x: x.strftime("%Y-%m-%d %h:%m")
+            datetime: lambda x: x.strftime("%Y-%m-%d %H:%M")
         }
 
 
